@@ -44,8 +44,8 @@ cc -std=c11 -Wall -Wextra -Werror tests/native/identity_paths_test.c -o /tmp/ide
 
 The `.mpp` is generated under `patches/build/libs/`. The bundle check verifies that the identity
 DEX and native library are included and that no APK or keystore has been bundled accidentally.
-The existing semantic-release workflow handles releases from `main` / `dev`; feature branches
-and pull requests run compilation and verification without publishing a release.
+The existing semantic-release workflow handles releases from `main` / `dev`; pull requests run compilation and verification without publishing a release. Their `.mpp`
+bundles are available for seven days under the workflow run’s **Artifacts**.
 
 See [implementation and validation notes](docs/weibo-repair.md). GPLv3; see [LICENSE](LICENSE)
 and the retained Morphe template [NOTICE](NOTICE).
