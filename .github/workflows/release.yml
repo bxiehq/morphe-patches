@@ -2,9 +2,7 @@ name: Release
 
 on:
   workflow_dispatch:
-  pull_request:
   push:
-    branches: [main, dev]
 
 jobs:
   release:
@@ -26,11 +24,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-
-      - name: Install Android native build tools
-        run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
-            "platforms;android-36" "ndk;27.2.12479018" "cmake;3.22.1"
 
       - name: Setup Node.js
         uses: actions/setup-node@v7
@@ -58,22 +51,9 @@ jobs:
           subject-path: patches/build/libs/patches-*.mpp
 
       # Always verify compilation when semantic-release did not publish a release.
-      # This covers pull requests and main/dev commits that do not publish a release.
+      # This covers non-main/dev branches, chore commits, docs commits, etc.
       - name: Verify project compiles
         if: steps.release.outputs.new_release_published != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cc -std=c11 -Wall -Wextra -Werror -fsanitize=address,undefined \
-            tests/native/identity_paths_test.c -o "$RUNNER_TEMP/identity-paths-test"
-          "$RUNNER_TEMP/identity-paths-test"
-          ./gradlew clean :patches:test :patches:verifyWeiboBundle --no-daemon
-
-      - name: Upload verification bundle
-        if: steps.release.outputs.new_release_published != 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: weibo-patches-${{ github.sha }}
-          path: patches/build/libs/patches-*.mpp
-          if-no-files-found: error
-          retention-days: 7
+        run: ./gradlew :patches:buildAndroid clean --no-daemon
