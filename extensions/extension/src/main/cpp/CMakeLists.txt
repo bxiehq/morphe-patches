@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(weibo_identity C)
+add_library(weiboidentity SHARED identity.c)
+target_compile_features(weiboidentity PRIVATE c_std_11)
+target_compile_options(weiboidentity PRIVATE -Wall -Wextra -Werror)
+target_link_options(weiboidentity PRIVATE -Wl,-z,max-page-size=16384)
+target_link_libraries(weiboidentity PRIVATE dl log)
